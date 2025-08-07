@@ -1,11 +1,12 @@
 from django.urls import path, include, re_path
 
-from .views import HomeView, ReportCompletedAppointmentsView
+from .views import HomeView
 from .views import ClientListView, ClientModalView, ClientUpdateView, ClientDeleteView
 from .views import ServiceListView, ServiceModalView, ServiceUpdateView, ServiceDeleteView
 from .views import ProfessionalListView, ProfessionalModalView, ProfessionalUpdateView, ProfessionalDeleteView
 from .views import AppointmentModalView, AppointmentUpdateView, AppointmentDeleteView, AppointmentEditFormAjaxView, \
     AppointmentDeleteDataAjaxView, AppointmentCreateAjaxView
+from .views import ReportCompletedAppointmentsView, ExportCompletedAppointmentsXLSXView
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -34,5 +35,6 @@ urlpatterns = [
     path('professional/update/<int:pk>/', ProfessionalModalView.as_view(), name='professional-update'),
     path('professional/delete/<int:pk>/', ProfessionalDeleteView.as_view(), name='professional-delete'),
 
-    path('report/completed/', ReportCompletedAppointmentsView.as_view(), name='report-completed'),
+    path('reports/completed/', ReportCompletedAppointmentsView.as_view(), name='report-completed'),
+    path('reports/completed-appointments/xlsx/', ExportCompletedAppointmentsXLSXView.as_view(), name='report-completed-appointments-xlsx'),
 ]

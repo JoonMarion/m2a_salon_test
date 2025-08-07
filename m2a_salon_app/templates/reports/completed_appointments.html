@@ -13,16 +13,22 @@
             <form method="get" class="row g-3 align-items-end mb-4">
                 <div class="col-md-4">
                     <label for="start_date" class="form-label">De:</label>
-                    <input type="date" id="start_date" name="start_date" value="{{ start_date }}" class="form-control">
+                    <input type="date" id="start_date" name="start_date" value="{{ start_date }}"
+                           class="form-control form-control-sm">
                 </div>
                 <div class="col-md-4">
                     <label for="end_date" class="form-label">Até:</label>
-                    <input type="date" id="end_date" name="end_date" value="{{ end_date }}" class="form-control">
+                    <input type="date" id="end_date" name="end_date" value="{{ end_date }}"
+                           class="form-control form-control-sm">
                 </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-funnel-fill me-1"></i>Filtrar
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="bi bi-funnel-fill me-1"></i> Filtrar
                     </button>
+                    <a href="{% url 'report-completed-appointments-xlsx' %}?start_date={{ start_date }}&end_date={{ end_date }}"
+                       class="btn btn-success btn-sm">
+                        <i class="bi bi-file-earmark-spreadsheet-fill me-1"></i> Exportar XLSX
+                    </a>
                 </div>
             </form>
 
@@ -32,16 +38,28 @@
             </div>
 
             <div>
-                <h5 class="text-secondary mb-3">Serviços por Profissional:</h5>
-                {% if summary_by_professional %}
-                <ul class="list-group">
-                    {% for item in summary_by_professional %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ item.professional__name }}
-                        <span class="badge bg-success rounded-pill">{{ item.total }}</span>
-                    </li>
-                    {% endfor %}
-                </ul>
+                <h5 class="text-secondary mb-3">Agendamentos concluídos:</h5>
+                {% if completed_appointments %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Serviço</th>
+                            <th>Profissional</th>
+                            <th>Data e Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in completed_appointments %}
+                        <tr>
+                            <td>{{ appt.client.name }}</td>
+                            <td>{{ appt.service.name }}</td>
+                            <td>{{ appt.professional.name }}</td>
+                            <td>{{ appt.scheduled_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
                 {% else %}
                 <div class="alert alert-info" role="alert">
                     Nenhum serviço concluído no período selecionado.

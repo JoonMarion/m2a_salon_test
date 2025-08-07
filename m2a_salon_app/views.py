@@ -20,6 +20,8 @@ from .forms import ClientForm, ServiceForm, ProfessionalForm, AppointmentForm
 from .models import Client, Service, Professional, Appointment
 from .utils import login_required_mixin
 
+import openpyxl
+
 
 @login_required_mixin
 class HomeView(TemplateView):
@@ -373,7 +375,7 @@ class ReportCompletedAppointmentsView(TemplateView):
         completed_appointments = Appointment.objects.filter(
             status=Appointment.STATUS_COMPLETED,
             scheduled_at__date__range=(start, end)
-        ).select_related('professional', 'service')
+        ).select_related('client', 'professional', 'service').order_by('scheduled_at')
 
         summary_by_professional = completed_appointments.values(
             'professional__name'
@@ -386,9 +388,52 @@ class ReportCompletedAppointmentsView(TemplateView):
             'end_date': end.isoformat(),
             'total_completed': total_completed,
             'summary_by_professional': summary_by_professional,
+            'completed_appointments': completed_appointments,
         })
 
         return context
+
+
+@login_required_mixin
+class ExportCompletedAppointmentsXLSXView(View):
+
+    def get(self, request, *args, **kwargs):
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        try:
+            start = parse_date(start_date) if start_date else now().date() - timedelta(days=30)
+            end = parse_date(end_date) if end_date else now().date()
+        except ValueError:
+            start = now().date() - timedelta(days=30)
+            end = now().date()
+
+        appointments = Appointment.objects.filter(
+            status=Appointment.STATUS_COMPLETED,
+            scheduled_at__date__range=(start, end)
+        ).select_related('client', 'professional', 'service').order_by('scheduled_at')
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Agendamentos Concluídos"
+
+        headers = ['Cliente', 'Serviço', 'Profissional', 'Data e Hora']
+        ws.append(headers)
+
+        for appt in appointments:
+            ws.append([
+                appt.client.name,
+                appt.service.name,
+                appt.professional.name,
+                appt.scheduled_at.strftime('%d/%m/%Y %H:%M'),
+            ])
+
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=agendamentos_concluidos.xlsx'
+        wb.save(response)
+        return response
 
 
 @login_required_mixin
