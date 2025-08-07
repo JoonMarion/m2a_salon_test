@@ -83,8 +83,7 @@ Esse comando cria automaticamente:
 - Agendamento de serviços com status (agendado, concluído, cancelado)
 - Filtros por data, profissional e status
 - Modal dinâmico para criar/editar sem recarregar a página
-- Relatórios por período e profissional
-- Interface com Bootstrap 5 + ícones
+- Relatórios por período
 </details>
 
 <details>
