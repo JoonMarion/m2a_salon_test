@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Count
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.utils.decorators import method_decorator
 from django.utils.dateparse import parse_date
 
@@ -21,6 +21,7 @@ from .models import Client, Service, Professional, Appointment
 from .utils import login_required_mixin
 
 import openpyxl
+from openpyxl.styles import Font, PatternFill
 
 
 @login_required_mixin
@@ -415,10 +416,22 @@ class ExportCompletedAppointmentsXLSXView(View):
 
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = "Agendamentos Concluídos"
+
+        start_str = start.strftime('%d-%m-%Y')
+        end_str = end.strftime('%d-%m-%Y')
+
+        ws.title = f"Agendamentos {start_str} a {end_str}"
 
         headers = ['Cliente', 'Serviço', 'Profissional', 'Data e Hora']
         ws.append(headers)
+
+        header_fill = PatternFill(start_color='000000', end_color='000000', fill_type='solid')
+        header_font = Font(color='FFFFFF', bold=True)
+
+        for col_num, _ in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col_num)
+            cell.fill = header_fill
+            cell.font = header_font
 
         for appt in appointments:
             ws.append([
@@ -431,7 +444,7 @@ class ExportCompletedAppointmentsXLSXView(View):
         response = HttpResponse(
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
-        response['Content-Disposition'] = 'attachment; filename=agendamentos_concluidos.xlsx'
+        response['Content-Disposition'] = f'attachment; filename=agendamentos_concluidos_{start_str}_a_{end_str}.xlsx'
         wb.save(response)
         return response
 
