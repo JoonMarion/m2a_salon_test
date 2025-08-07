@@ -51,7 +51,7 @@ Acesse [http://127.0.0.1:8000](http://127.0.0.1:8000) no navegador.
 </details>
 
 <details>
-<summary><strong> 5. Populando o banco com dados fictícios (opcional)</strong></summary>
+<summary><strong>5. Populando o banco com dados fictícios (opcional)</strong></summary>
 
 Execute o comando:
 
@@ -61,12 +61,43 @@ python manage.py populate_db
 
 Esse comando cria automaticamente:
 
-- 10 tipos de serviços (ex: Corte, Maquiagem, etc)
-- 200 profissionais com especialidades aleatórias
-- 1000 clientes com dados realistas
-- 2000 agendamentos com diferentes status (`scheduled`, `completed`, `canceled`) distribuídos em até 90 dias atrás
+- 15 tipos de serviços (ex: Corte, Maquiagem, etc)  
+- 200 profissionais com especialidades aleatórias  
+- 1000 clientes com dados realistas  
+- 2000 agendamentos com diferentes status (`scheduled`, `completed`, `canceled`) distribuídos nos últimos 90 dias  
 
-Útil para testes de performance, layout, filtros, relatórios e funcionalidade geral do sistema.
+**Tempo de execução estimado**: cerca de **3 minutos e 30 segundos** em um processador **Intel Core i5 de 10ª geração**.
+
+### Personalização
+
+Se quiser alterar a quantidade de agendamentos criados, edite a variável `max_appointments` no script:
+
+```python
+max_appointments = 2000  # Altere para a quantidade desejada
+```
+
+#### Para alterar outras quantidades:
+
+- **Clientes**:  
+  Edite o valor do `range` na criação de clientes:  
+  ```python
+  for _ in range(1000):  # Altere 1000 para o número desejado
+  ```
+
+- **Profissionais**:  
+  Edite o valor do `range` na criação de profissionais:  
+  ```python
+  for _ in range(200):  # Altere 200 para o número desejado
+  ```
+
+- **Serviços**:  
+  Modifique a lista `service_names` para adicionar, remover ou alterar os serviços disponíveis:  
+  ```python
+  service_names = [
+      'Corte de cabelo', 'Pintura de cabelo', ..., 'Design de sobrancelhas'
+  ]
+  ```
+
 </details>
 
 <details>
