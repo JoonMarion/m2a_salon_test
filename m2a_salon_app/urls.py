@@ -13,10 +13,10 @@ urlpatterns = [
     path('appointment/create/data', AppointmentCreateAjaxView.as_view(), name='appointment-create-ajax'),
     path('appointment/create/', AppointmentModalView.as_view(), name='appointment-create'),
 
-    path('appointments/<int:pk>/update-form/', AppointmentEditFormAjaxView.as_view(), name='appointment-update-form-ajax'),
+    path('appointment/update-form/<int:pk>/', AppointmentEditFormAjaxView.as_view(), name='appointment-update-form-ajax'),
     path('appointment/update/<int:pk>/', AppointmentUpdateView.as_view(), name='appointment-update'),
 
-    path('appointments/<int:pk>/delete-data/', AppointmentDeleteDataAjaxView.as_view(),name='appointment-delete-data-ajax'),
+    path('appointment/delete-data/<int:pk>/', AppointmentDeleteDataAjaxView.as_view(),name='appointment-delete-data-ajax'),
     path('appointment/delete/<int:pk>/', AppointmentDeleteView.as_view(), name='appointment-delete'),
 
 
