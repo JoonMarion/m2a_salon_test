@@ -57,10 +57,18 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
     <div class="container-fluid">
         <a class="navbar-brand ms-4" href="/">m2a Salon</a>
-        <div class="d-flex ms-auto align-items-center">
+        <div class="d-flex ms-auto align-items-center gap-3">
             <span class="nav-user-name">
               Olá, {{ request.user.get_full_name|default:request.user.username }}!
             </span>
+            <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                        title="Sair">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Sair</span>
+                </button>
+            </form>
         </div>
     </div>
 </nav>
