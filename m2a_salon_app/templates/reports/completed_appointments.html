@@ -3,6 +3,9 @@
 {% block title %}Relatório — m2a Salon{% endblock %}
 
 {% block content %}
+
+
+
 <div class="container py-5">
     <div class="card shadow-sm rounded-4">
         <div class="card-body">
@@ -10,27 +13,36 @@
                 <i class="bi bi-bar-chart-fill me-2"></i>Relatório de Serviços Concluídos
             </h2>
 
-            <form method="get" class="row g-3 align-items-end mb-4">
-                <div class="col-md-4">
+            <form method="get" class="row g-2 g-md-3 align-items-end mb-4">
+                <div class="col-12 col-md-2">
                     <label for="start_date" class="form-label">De:</label>
                     <input type="date" id="start_date" name="start_date" value="{{ start_date }}"
                            class="form-control form-control-sm">
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-md-2">
                     <label for="end_date" class="form-label">Até:</label>
                     <input type="date" id="end_date" name="end_date" value="{{ end_date }}"
                            class="form-control form-control-sm">
                 </div>
-                <div class="col-md-4 d-flex gap-2">
+                <div class="col-12 col-md-4">
+                    <label for="ordering" class="form-label">Ordenar por:</label>
+                    <select name="ordering" class="form-select form-select-sm">
+                        {% for value, label in ordering_options %}
+                        <option value="{{ value }}" {% if ordering == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 d-flex flex-wrap flex-lg-nowrap gap-2 mt-2 mt-lg-0">
                     <button type="submit" class="btn btn-primary btn-sm">
                         <i class="bi bi-funnel-fill me-1"></i> Filtrar
                     </button>
-                    <a href="{% url 'report-completed-appointments-xlsx' %}?start_date={{ start_date }}&end_date={{ end_date }}"
+                    <a href="{% url 'report-completed-appointments-xlsx' %}?start_date={{ start_date }}&end_date={{ end_date }}&ordering={{ ordering }}"
                        class="btn btn-success btn-sm">
                         <i class="bi bi-file-earmark-spreadsheet-fill me-1"></i> Exportar XLSX
                     </a>
                 </div>
             </form>
+
 
             <div class="mb-4">
                 <h5 class="text-secondary">Total de serviços concluídos:</h5>
@@ -42,22 +54,22 @@
                 {% if completed_appointments %}
                 <table class="table table-striped">
                     <thead>
-                        <tr>
-                            <th>Cliente</th>
-                            <th>Serviço</th>
-                            <th>Profissional</th>
-                            <th>Data e Hora</th>
-                        </tr>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Serviço</th>
+                        <th>Profissional</th>
+                        <th>Data e Hora</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for appt in completed_appointments %}
-                        <tr>
-                            <td>{{ appt.client.name }}</td>
-                            <td>{{ appt.service.name }}</td>
-                            <td>{{ appt.professional.name }}</td>
-                            <td>{{ appt.scheduled_at|date:"d/m/Y H:i" }}</td>
-                        </tr>
-                        {% endfor %}
+                    {% for appt in completed_appointments %}
+                    <tr>
+                        <td>{{ appt.client.name }}</td>
+                        <td>{{ appt.service.name }}</td>
+                        <td>{{ appt.professional.name }}</td>
+                        <td>{{ appt.scheduled_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
                 {% else %}

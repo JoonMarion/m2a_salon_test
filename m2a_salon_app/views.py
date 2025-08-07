@@ -232,12 +232,21 @@ class ProfessionalListView(ListView):
     ordering = ['name']
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        query = self.request.GET.get('q')
+        qs = Professional.objects.prefetch_related('specialties').all()
+        q = self.request.GET.get('q')
+        specialty = self.request.GET.get('specialty')
+        is_active = self.request.GET.get('is_active')
 
-        if query:
-            queryset = queryset.filter(name__icontains=query)
-        return queryset
+        if q:
+            qs = qs.filter(name__icontains=q)
+
+        if specialty:
+            qs = qs.filter(specialties__id=specialty)
+
+        if is_active in ['True', 'False']:
+            qs = qs.filter(is_active=(is_active == 'True'))
+
+        return qs.distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -363,8 +372,19 @@ class ReportCompletedAppointmentsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        start_date = self.request.GET.get('start_date')
-        end_date = self.request.GET.get('end_date')
+        request = self.request
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        ordering = request.GET.get('ordering', 'scheduled_at')
+
+        valid_orderings = [
+            'scheduled_at', '-scheduled_at',
+            'client__name', '-client__name',
+            'service__name', '-service__name',
+            'professional__name', '-professional__name',
+        ]
+        if ordering not in valid_orderings:
+            ordering = 'scheduled_at'
 
         try:
             start = parse_date(start_date) if start_date else now().date() - timedelta(days=30)
@@ -376,7 +396,7 @@ class ReportCompletedAppointmentsView(TemplateView):
         completed_appointments = Appointment.objects.filter(
             status=Appointment.STATUS_COMPLETED,
             scheduled_at__date__range=(start, end)
-        ).select_related('client', 'professional', 'service').order_by('scheduled_at')
+        ).select_related('client', 'professional', 'service').order_by(ordering)
 
         summary_by_professional = completed_appointments.values(
             'professional__name'
@@ -387,11 +407,21 @@ class ReportCompletedAppointmentsView(TemplateView):
         context.update({
             'start_date': start.isoformat(),
             'end_date': end.isoformat(),
+            'ordering': ordering,
             'total_completed': total_completed,
             'summary_by_professional': summary_by_professional,
             'completed_appointments': completed_appointments,
+            'ordering_options': [
+                ('scheduled_at', 'Data (mais antiga)'),
+                ('-scheduled_at', 'Data (mais recente)'),
+                ('client__name', 'Cliente (A-Z)'),
+                ('-client__name', 'Cliente (Z-A)'),
+                ('service__name', 'Serviço (A-Z)'),
+                ('-service__name', 'Serviço (Z-A)'),
+                ('professional__name', 'Profissional (A-Z)'),
+                ('-professional__name', 'Profissional (Z-A)'),
+            ]
         })
-
         return context
 
 
@@ -401,6 +431,16 @@ class ExportCompletedAppointmentsXLSXView(View):
     def get(self, request, *args, **kwargs):
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
+        ordering = request.GET.get('ordering', 'scheduled_at')
+
+        valid_orderings = [
+            'scheduled_at', '-scheduled_at',
+            'client__name', '-client__name',
+            'service__name', '-service__name',
+            'professional__name', '-professional__name',
+        ]
+        if ordering not in valid_orderings:
+            ordering = 'scheduled_at'
 
         try:
             start = parse_date(start_date) if start_date else now().date() - timedelta(days=30)
@@ -412,7 +452,7 @@ class ExportCompletedAppointmentsXLSXView(View):
         appointments = Appointment.objects.filter(
             status=Appointment.STATUS_COMPLETED,
             scheduled_at__date__range=(start, end)
-        ).select_related('client', 'professional', 'service').order_by('scheduled_at')
+        ).select_related('client', 'professional', 'service').order_by(ordering)
 
         wb = openpyxl.Workbook()
         ws = wb.active
