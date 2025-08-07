@@ -109,13 +109,20 @@ class AppointmentForm(forms.ModelForm):
             ),
             'status': forms.Select(attrs={'class': 'form-control'}),
         }
+        labels = {
+            'client': 'Cliente',
+            'service': 'Serviço',
+            'professional': 'Profissional',
+            'scheduled_at': 'Data e hora agendada',
+            'status': 'Status',
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields['client'].queryset = Client.objects.order_by('name')
         self.fields['service'].queryset = Service.objects.order_by('name')
-        self.fields['professional'].queryset = Professional.objects.order_by('name')
+        self.fields['professional'].queryset = Professional.objects.filter(is_active=True).order_by('name')
 
         self.fields['client'].widget.attrs.update({'class': 'form-control'})
         self.fields['service'].widget.attrs.update({'class': 'form-control'})

@@ -18,10 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
             modalBody.innerHTML = data.form_html;
             form.action = createUrl;
-
-            if (window.djangoAutocompleteLight) {
-                window.djangoAutocompleteLight.init();
-            }
         } catch (error) {
             modalBody.innerHTML = '<p class="text-danger">Erro ao carregar o formulário.</p>';
         }

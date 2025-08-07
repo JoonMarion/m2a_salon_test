@@ -42,7 +42,6 @@ class HomeView(TemplateView):
         context['service_count'] = Service.objects.count()
         context['professional_count'] = Professional.objects.count()
 
-        context['appointment_form'] = AppointmentForm()
         context['appointment_create_url'] = reverse_lazy('appointment-create')
 
         appointments = Appointment.objects.filter(
@@ -50,24 +49,6 @@ class HomeView(TemplateView):
         ).select_related('client', 'service', 'professional')
 
         context['appointments_today'] = appointments
-
-        context['edit_forms'] = {
-            appt.pk: {
-                'form_html': AppointmentForm(instance=appt).as_p(),
-                'action_update_url': reverse('appointment-update', kwargs={'pk': appt.pk}),
-            }
-            for appt in appointments
-        }
-
-        context['delete_modal'] = {
-            appt.pk: {
-                'modal_id': f'delete-appointment-modal{appt.pk}',
-                'action_delete_url': reverse('appointment-delete', kwargs={'pk': appt.pk}),
-                'object_name': f"{appt.client.name} - {appt.service.name} às {appt.scheduled_at.strftime('%H:%M')}",
-            }
-            for appt in appointments
-        }
-
         return context
 
 
@@ -108,6 +89,13 @@ class ClientListView(ListView):
     paginate_by = 10
     ordering = ['name']
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        query = self.request.GET.get('q')
+        if query:
+            qs = qs.filter(name__icontains=query)
+        return qs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['client_form'] = ClientForm()
@@ -126,7 +114,7 @@ class ClientListView(ListView):
             client.pk: {
                 'modal_id': f'delete-client-modal{client.pk}',
                 'action_delete_url': reverse('client-delete', kwargs={'pk': client.pk}),
-                'object_name': client.name
+                'object_name': client.name,
             }
             for client in context['clients']
         }
@@ -169,6 +157,13 @@ class ServiceListView(ListView):
     template_name = 'services/list.html'
     paginate_by = 10
     ordering = ['name']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(name__icontains=q)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -233,9 +228,16 @@ class ProfessionalListView(ListView):
     paginate_by = 10
     ordering = ['name']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        query = self.request.GET.get('q')
+
+        if query:
+            queryset = queryset.filter(name__icontains=query)
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         context['professional_form'] = ProfessionalForm()
         context['professional_create_url'] = reverse_lazy('professional-create')
 
@@ -256,7 +258,6 @@ class ProfessionalListView(ListView):
             }
             for pro in context['professionals']
         }
-
         return context
 
 
