@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+
+{% block title %}Home — m2a Salon{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4 row-gap-3">
+        <div class="col-md-4">
+            <div class="card dashboard-card text-center position-relative">
+                <a href="{% url 'client-list' %}" class="stretched-link"></a>
+                <div class="card-body">
+                    <div class="card-icon mb-2"><i class="bi bi-person-fill"></i></div>
+                    <div class="card-title">Clientes</div>
+                    <div class="card-value">{{ client_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card dashboard-card text-center position-relative">
+                <a href="{% url 'professional-list' %}" class="stretched-link"></a>
+                <div class="card-body">
+                    <div class="card-icon mb-2"><i class="bi bi-people-fill"></i></div>
+                    <div class="card-title">Profissionais</div>
+                    <div class="card-value">{{ professional_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card dashboard-card text-center position-relative">
+                <a href="{% url 'service-list' %}" class="stretched-link"></a>
+                <div class="card-body">
+                    <div class="card-icon mb-2"><i class="bi bi-scissors"></i></div>
+                    <div class="card-title">Serviços</div>
+                    <div class="card-value">{{ service_count }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="d-flex justify-content-between">
+        <div>
+            <h3 class="mb-3">Agendamentos de {{ selected_date|date:"d/m/Y" }}</h3>
+        </div>
+        <div class="d-flex flex-column">
+            <button class="btn btn-outline-primary mb-4"
+                    data-bs-toggle="modal"
+                    data-bs-target="#create-modal"
+                    data-form-url="{% url 'appointment-create-ajax' %}"
+                    data-create-url="{% url 'appointment-create' %}">
+                <i class="bi bi-plus-circle"></i> Criar agendamento
+            </button>
+
+            <form method="get" class="d-flex align-items-center gap-2 mb-3">
+                <a href="?date={{ prev_date }}" class="btn btn-outline-secondary">&larr;</a>
+
+                <input type="date" name="date" class="form-control w-auto"
+                       value="{{ selected_date|date:'Y-m-d' }}" onchange="this.form.submit()">
+
+                <a href="?date={{ next_date }}" class="btn btn-outline-secondary">&rarr;</a>
+            </form>
+        </div>
+    </div>
+
+    {% if appointments_today %}
+    <ul class="list-group">
+        {% for appt in appointments_today %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ appt.client.name }}</strong> — {{ appt.service.name }}<br>
+                    <small>{{ appt.scheduled_at|date:"H:i" }} com {{ appt.professional.name }}</small>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge {{ appt.status|status_badge_class }}">{{ appt.status|translate_status }}</span>
+
+                    <div class="btn-group gap-2" role="group">
+                        <button class="btn btn-outline-secondary btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit-modal"
+                                data-pk="{{ appt.pk }}"
+                                data-form-url="{% url 'appointment-update-form-ajax' appt.pk %}"
+                                data-update-url="{% url 'appointment-update' appt.pk %}">
+                            <i class="bi bi-pencil"></i> Editar
+                        </button>
+
+                        <button class="btn btn-outline-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete-modal"
+                                data-delete-url="{% url 'appointment-delete-data-ajax' appt.pk %}"
+                                data-pk="{{ appt.pk }}">
+                            <i class="bi bi-trash"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-muted">Nenhum agendamento para {{ selected_date|date:"d/m/Y" }}.</p>
+    {% endif %}
+
+     <div class="modal fade" id="create-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="create-form" method="post">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Criar Agendamento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="create-modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="edit-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="update-form" method="post">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Agendamento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="edit-modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="delete-form" method="post" action="">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Excluir Agendamento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="delete-modal-text"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Excluir</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{{ form.media.css }}
+{{ form.media.js }}
+<script src="{% static 'js/appointment_load_modal.js' %}"></script>
+{% endblock %}

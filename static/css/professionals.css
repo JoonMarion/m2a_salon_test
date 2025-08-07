@@ -1,0 +1,45 @@
+/* Aplica flex container no bloco externo */
+div#id_specialties {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Cada checkbox fica em uma “coluna” */
+div#id_specialties > div {
+    flex: 1 1 45%;
+    display: flex;
+    align-items: center;
+}
+
+/* Estilo da label e alinhamento do texto */
+div#id_specialties label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: normal;
+    margin-bottom: 0;
+    width: 100%;
+}
+
+/* Remove margem padrão dos checkboxes */
+div#id_specialties input[type="checkbox"] {
+    margin: 0;
+}
+
+div#id_specialties > div {
+    flex: 1 1 100%; /* padrão: 1 por linha */
+}
+
+@media (min-width: 576px) {
+    div#id_specialties > div {
+        flex: 1 1 45%; /* 2 por linha */
+    }
+}
+
+@media (min-width: 768px) {
+    div#id_specialties > div {
+        flex: 1 1 30%; /* 3 por linha em telas médias+ */
+    }
+}

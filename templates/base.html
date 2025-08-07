@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{% block title %}m2a Salon{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div id="sidebar">
+    <ul class="nav flex-column px-3 mt-5">
+        <li class="nav-item mb-2">
+            <a class="nav-link" href="{% url 'home' %}">
+                <i class="bi bi-house-fill"></i>
+                <span class="link-text fw-semibold">Início</span>
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link" href="{% url 'client-list' %}">
+                <i class="bi bi-person-fill"></i>
+                <span class="link-text fw-semibold">Clientes</span>
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link" href="{% url 'professional-list' %}">
+                <i class="bi bi-people-fill"></i>
+                <span class="link-text fw-semibold">Profissionais</span>
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link" href="{% url 'service-list' %}">
+                <i class="bi bi-scissors"></i>
+                <span class="link-text fw-semibold">Serviços</span>
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link" href="{% url 'report-completed' %}">
+                <i class="bi bi-bar-chart-fill"></i>
+                <span class="link-text fw-semibold">Relatório</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<button id="menu-toggle" title="Alternar menu">
+    <i class="bi bi-chevron-double-left"></i>
+</button>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand ms-4" href="/">m2a Salon</a>
+        <div class="d-flex ms-auto align-items-center">
+            <span class="nav-user-name">
+              Olá, {{ request.user.get_full_name|default:request.user.username }}!
+            </span>
+        </div>
+    </div>
+</nav>
+
+<div id="content-wrapper" class="d-flex justify-content-center">
+    <div id="content" class="w-100">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+<div
+        id="toast-container"
+        aria-live="polite" aria-atomic="true"
+        class="position-fixed bottom-0 start-0 p-3"
+        style="z-index: 1080;"
+>
+    {% for message in messages %}
+    <div
+            class="toast align-items-center text-bg-{{ message.tags }} border-0 mb-2"
+            role="alert" aria-live="assertive" aria-atomic="true"
+            data-bs-delay="4000"
+    >
+        <div class="toast-body">
+            {{ message }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+
+<script src="{% static 'js/sidebar.js' %}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('#toast-container .toast').forEach(function(el) {
+            new bootstrap.Toast(el).show();
+        });
+    });
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>
