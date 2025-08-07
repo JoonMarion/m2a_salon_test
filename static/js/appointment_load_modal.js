@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await response.json();
             modalBody.innerHTML = data.form_html;
             form.action = createUrl;
-            console.log("data: ", data)
+
             if (window.djangoAutocompleteLight) {
                 window.djangoAutocompleteLight.init();
             }

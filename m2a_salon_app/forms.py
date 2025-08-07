@@ -1,4 +1,3 @@
-from dal import autocomplete
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -104,9 +103,6 @@ class AppointmentForm(forms.ModelForm):
         model = Appointment
         fields = ['client', 'service', 'professional', 'scheduled_at', 'status']
         widgets = {
-            'client': autocomplete.ModelSelect2(url='client-autocomplete', attrs={'class': 'form-control'}),
-            'service': autocomplete.ModelSelect2(url='service-autocomplete', attrs={'class': 'form-control'}),
-            'professional': autocomplete.ModelSelect2(url='professional-autocomplete', attrs={'class': 'form-control'}),
             'scheduled_at': forms.DateTimeInput(
                 format='%Y-%m-%dT%H:%M',
                 attrs={'type': 'datetime-local', 'class': 'form-control'}
@@ -116,11 +112,14 @@ class AppointmentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.fields.clear()
 
         self.fields['client'].queryset = Client.objects.order_by('name')
         self.fields['service'].queryset = Service.objects.order_by('name')
         self.fields['professional'].queryset = Professional.objects.order_by('name')
+
+        self.fields['client'].widget.attrs.update({'class': 'form-control'})
+        self.fields['service'].widget.attrs.update({'class': 'form-control'})
+        self.fields['professional'].widget.attrs.update({'class': 'form-control'})
 
         self.fields['status'].choices = [
             (Appointment.STATUS_SCHEDULED, _('Agendado')),
