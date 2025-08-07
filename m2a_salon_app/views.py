@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Count
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.utils.dateparse import parse_date
 
@@ -89,9 +89,15 @@ class AppointmentDeleteView(DeleteView):
     success_url = reverse_lazy('home')
     template_name = 'components/modal_confirm_delete.html'
 
-    def delete(self, request, *args, **kwargs):
-        messages.success(self.request, 'Agendamento excluído com sucesso!')
-        return super().delete(request, *args, **kwargs)
+    def form_valid(self, form):
+        nome = str(self.object)
+        messages.success(
+            self.request,
+            f'{self.model._meta.verbose_name.capitalize()} "{nome}" excluído com sucesso!'
+        )
+        success_url = self.get_success_url()
+        self.object.delete()
+        return HttpResponseRedirect(success_url)
 
 
 @login_required_mixin
@@ -132,6 +138,16 @@ class ClientDeleteView(DeleteView):
     model = Client
     success_url = reverse_lazy('client-list')
     template_name = 'clients/list.html'
+
+    def form_valid(self, form):
+        nome = str(self.object)
+        messages.success(
+            self.request,
+            f'{self.model._meta.verbose_name.capitalize()} "{nome}" excluído com sucesso!'
+        )
+        success_url = self.get_success_url()
+        self.object.delete()
+        return HttpResponseRedirect(success_url)
 
 
 @login_required_mixin
@@ -198,6 +214,15 @@ class ServiceDeleteView(DeleteView):
     success_url = reverse_lazy('service-list')
     template_name = 'services/list.html'
 
+    def form_valid(self, form):
+        nome = str(self.object)
+        messages.success(
+            self.request,
+            f'{self.model._meta.verbose_name.capitalize()} "{nome}" excluído com sucesso!'
+        )
+        success_url = self.get_success_url()
+        self.object.delete()
+        return HttpResponseRedirect(success_url)
 
 
 @login_required_mixin
@@ -252,6 +277,16 @@ class ProfessionalDeleteView(DeleteView):
     model = Professional
     template_name = 'professionals/list.html'
     success_url = reverse_lazy('professional-list')
+
+    def form_valid(self, form):
+        nome = str(self.object)
+        messages.success(
+            self.request,
+            f'{self.model._meta.verbose_name.capitalize()} "{nome}" excluído com sucesso!'
+        )
+        success_url = self.get_success_url()
+        self.object.delete()
+        return HttpResponseRedirect(success_url)
 
 
 @login_required_mixin
