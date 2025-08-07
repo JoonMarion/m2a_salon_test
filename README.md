@@ -5,7 +5,7 @@ Aplicação web desenvolvida com Django para gerenciamento de agendamentos, clie
 <details>
 <summary><strong>1. Requisitos do Projeto</strong></summary>
 
-- Python 3.12+ (REQUISITO PARA RODAR OS SCRIPTS INICIAIS
+- Python 3.12+ (REQUISITO PARA RODAR OS SCRIPTS INICIAIS)
 - Ambiente virtual (venv)
 - Django 4.2+
 - SQLite (padrão)
