@@ -22,7 +22,7 @@ class ProfessionalAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active')
     search_fields = ('name',)
     list_filter = ('is_active', 'specialties')
-    filter_horizontal = ('specialties',)  # Para melhorar o M2M no admin
+    filter_horizontal = ('specialties',)
 
 
 @admin.register(Appointment)
