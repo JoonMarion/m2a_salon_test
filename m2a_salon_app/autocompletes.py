@@ -3,7 +3,6 @@ from .models import Client, Service, Professional
 
 class ClientAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        print('get_queryset ClientAutocomplete chamado com q=', self.q)
         qs = Client.objects.all()
 
         if self.q:
